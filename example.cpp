@@ -1,0 +1,14 @@
+#include "reactor.h"
+#include <iostream>
+
+void print_hello_world(){
+  std::cout << "Hello World" << std::endl;
+}
+
+int main(char* argv, int argc)
+{
+  Reactor *reactor = Reactor::getInstance();
+  reactor->callLater(0, &print_hello_world);
+  reactor->run();
+  return 0;
+}
