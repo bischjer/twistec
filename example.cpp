@@ -5,7 +5,7 @@ void print_hello_world(){
   std::cout << "Hello World" << std::endl;
 }
 
-int main(char* argv, int argc)
+int main(int argc, char** argv)
 {
   Reactor *reactor = Reactor::getInstance();
   reactor->callLater(0, &print_hello_world);
