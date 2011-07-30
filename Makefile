@@ -1,16 +1,21 @@
 CC=g++
 CFLAGS=-Wall -Werror
+INC=-I/opt/local/include
+all: reactor example
 
-all: log reactor example
-
-log:
-	$(CC) -g log.cpp log.h -shared -o bin/log.o $(CFLAGS)
+debug: reactor_debug example_debug
 
 reactor:
-	$(CC) -g reactor.cpp reactor.h bin/log.o -shared -o bin/libreactor.o $(CFLAGS)
+	$(CC) -g reactor.cpp reactor.h log.h -shared -o bin/libreactor.o $(CFLAGS) $(INC)
+
+reactor_debug:
+	$(CC) -g reactor.cpp reactor.h log.h -shared -o bin/libreactor.o $(CFLAGS) $(INC) -DDEBUG
 
 example:
-	$(CC) -g example.cpp bin/libreactor.o -o bin/example $(CFLAGS)
+	$(CC) -g example.cpp bin/libreactor.o -o bin/example $(CFLAGS) $(INC)
+
+example_debug:
+	$(CC) -g example.cpp bin/libreactor.o -o bin/example $(CFLAGS) $(INC) -DDEBUG
 
 .PHONY: clean
 

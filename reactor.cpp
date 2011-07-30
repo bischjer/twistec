@@ -1,12 +1,12 @@
 #include "reactor.h"
 
 Reactor::Reactor()
+  :should_stop(true),
+   select_timeval(0.01)
 {
-  should_stop = true;
   FD_ZERO(&read_filedescriptors);
   FD_ZERO(&write_filedescriptors);
   FD_ZERO(&error_filedescriptors);
-  select_timeval = 0.01;
 }
 
 Reactor* Reactor::getInstance()
@@ -21,14 +21,7 @@ Reactor* Reactor::getInstance()
 
 void Reactor::handle_signal(int signal)
 {
-  std::string s;
-  std::stringstream out;
-  out << signal;
-  s = out.str();
-  std::string log_output("Signal ");
-  log_output += s;
-  log_output += " caught. Terminating mainloop";
-  log((char*)log_output.c_str());
+  log("Signal %d caught. Terminating mainloop", signal);
   Reactor* reactor = Reactor::getInstance();
   reactor->stop();
 }
@@ -48,6 +41,7 @@ void Reactor::run()
     this->check_selects();
     this->run_timers();
   }
+  this->timer_list.clear();
   return;
 }
 
@@ -76,6 +70,17 @@ void Reactor::check_selects()
 
 void Reactor::run_timers()
 {
+  boost::ptr_list<DelayedCall>::iterator timer;
+  for(timer = this->timer_list.begin();
+      timer != this->timer_list.end();
+      timer ++)
+  {
+    if (timer->timedOut())
+    {
+      timer->func();
+      this->removeTimedCall(&(*timer));
+    }
+  }
 }
 
 void Reactor::stop()
@@ -87,6 +92,7 @@ DelayedCall* Reactor::newDelayedCall(int time, void (*func)())
 {
   DelayedCall* call_later = new DelayedCall(time,
                                             func);
+  this->timer_list.push_back(call_later);
   return call_later;
 }
 
@@ -97,14 +103,30 @@ DelayedCall* Reactor::callLater(int time, void (*func)())
 
 void Reactor::cancelTimedCall(DelayedCall* timed_call)
 {
-  delete timed_call;
+  this->removeTimedCall(timed_call);
+}
+
+void Reactor::removeTimedCall(DelayedCall* timed_call)
+{
+  boost::ptr_list<DelayedCall>::iterator timer;
+  for (timer=this->timer_list.begin();
+       timer!=this->timer_list.end();
+       timer++)
+  {
+    if(&(*timer) == timed_call)
+    {
+      this->timer_list.erase(timer);
+    }
+  }
   return;
 }
 
-DelayedCall::DelayedCall(int time,
+DelayedCall::DelayedCall(double time,
                          void (*func)())
 {
-  this->time = time;
+  gettimeofday(&this->time, NULL);
+  this->time.tv_sec += (int) time;
+  this->time.tv_usec += time-(int)time;
   this->func = func;
   this->called = false;
   this->cancelled = false;
@@ -112,4 +134,25 @@ DelayedCall::DelayedCall(int time,
 
 DelayedCall::~DelayedCall()
 {
+}
+
+bool DelayedCall::timedOut()
+{
+  timeval now;
+  gettimeofday(&now, NULL);
+#ifdef DEBUG
+  log_debug("%d.%d %d.%d\n",
+            (int)this->time.tv_sec,
+            (int)this->time.tv_usec,
+            (int)now.tv_sec,
+            (int)now.tv_usec);
+#endif
+  if (now.tv_sec > this->time.tv_sec ||
+      (now.tv_sec == this->time.tv_sec &&
+       now.tv_usec > this->time.tv_usec)
+      )
+  {
+    return true;
+  }
+  return false;
 }

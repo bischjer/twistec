@@ -4,23 +4,24 @@
 
 #include "log.h"
 #include <signal.h>
-#include <string>
-#include <sstream>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <boost/ptr_container/ptr_list.hpp>
 
 class DelayedCall{
+  friend class Reactor;
  private:
-  int time;
+  timeval time;
   void (*func)();
   void (*canceller)(DelayedCall*);
   bool cancelled;
   bool called;
 
  public:
-  DelayedCall(int time,
+  DelayedCall(double time,
               void (*func)());
   ~DelayedCall();
+  bool timedOut();
   void cancel();
   void isActive();
 };
@@ -38,6 +39,7 @@ private :
     fd_set read_filedescriptors;
     fd_set write_filedescriptors;
     fd_set error_filedescriptors;
+    boost::ptr_list<DelayedCall> timer_list;
     Reactor();
 
 public :
@@ -46,6 +48,7 @@ public :
 
     static Reactor* getInstance();
     void cancelTimedCall(DelayedCall* timedcall);
+    void removeTimedCall(DelayedCall* timed_call);
     DelayedCall* callLater(int time, void (*func)());
 };
 
