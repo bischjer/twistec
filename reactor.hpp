@@ -2,7 +2,7 @@
 #define REACTOR_H
 #define NULL 0
 
-#include "log.h"
+#include "log.hpp"
 #include <boost/ptr_container/ptr_list.hpp>
 
 #ifdef __cplusplus
@@ -63,6 +63,6 @@ public :
     DelayedCall* callLater(int time, void (*func)());
 };
 
-Reactor* Reactor::instance = NULL;
+
 
 #endif

@@ -1,4 +1,6 @@
-#include "reactor.h"
+#include "reactor.hpp"
+
+Reactor* Reactor::instance = NULL;
 
 Reactor::Reactor()
   :should_stop(true),
