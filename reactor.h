@@ -3,10 +3,21 @@
 #define NULL 0
 
 #include "log.h"
+#include <boost/ptr_container/ptr_list.hpp>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <stdio.h>
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/time.h>
-#include <boost/ptr_container/ptr_list.hpp>
+
+#ifdef __cplusplus
+}
+#endif
+#define FD_COPY(f, t) memcpy(t, f, sizeof(*(f))) 
+
 
 class DelayedCall{
   friend class Reactor;
