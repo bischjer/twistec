@@ -47,6 +47,11 @@ depend: make.dep
 make.dep:
 	for dir in $(DIRS); do if [ ! -d $$dir ]; then mkdir $$dir; fi; done
 	for file in $(SOURCES); do $(CXX) $(CXXFLAGS) -M $$file >> $@; done
+	@echo '***'
+	@echo
+	@echo 'You might want to concider running make dev-install!'
+	@echo
+	@echo '***'
 
 include make.dep
 
