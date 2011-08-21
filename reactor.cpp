@@ -117,10 +117,14 @@ void Reactor::removeTimedCall(DelayedCall* timed_call)
   {
     if(&(*timer) == timed_call)
     {
-      this->timer_list.erase(timer);
+      //TODO: there is a bug in reading memory from //
+      //this->timer_list.erase(timer);
+      /* This replicates the same crash
+      //this->timer_list.clear();
+      */
     }
   }
-  return;
+
 }
 
 DelayedCall::DelayedCall(double time,
