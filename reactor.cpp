@@ -72,15 +72,15 @@ void Reactor::check_selects()
 
 void Reactor::run_timers()
 {
-  boost::ptr_list<DelayedCall>::iterator timer;
+  std::list<DelayedCall*>::iterator timer;
   for(timer = this->timer_list.begin();
       timer != this->timer_list.end();
       timer ++)
   {
-    if (timer->timedOut())
+    if ((*timer)->timedOut())
     {
-      timer->func();
-      this->removeTimedCall(&(*timer));
+      (*timer)->func();
+      this->removeTimedCall(*timer);
     }
   }
 }
@@ -110,18 +110,19 @@ void Reactor::cancelTimedCall(DelayedCall* timed_call)
 
 void Reactor::removeTimedCall(DelayedCall* timed_call)
 {
-  boost::ptr_list<DelayedCall>::iterator timer;
+    //this->timer_list.erase(timed_call);
+
+  std::list<DelayedCall*>::iterator timer;
   for (timer=this->timer_list.begin();
        timer!=this->timer_list.end();
        timer++)
   {
-    if(&(*timer) == timed_call)
+
+    if(*timer == timed_call)
     {
-      //TODO: there is a bug in reading memory from //
-      //this->timer_list.erase(timer);
-      /* This replicates the same crash
-      //this->timer_list.clear();
-      */
+        log("%p %p\n", (void *) *timer, (void *) timed_call);
+        delete *timer;
+        break;
     }
   }
 
