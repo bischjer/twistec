@@ -120,7 +120,9 @@ void Reactor::removeTimedCall(DelayedCall* timed_call)
 
     if(*timer == timed_call)
     {
+#ifdef DEBUG
         log("%p %p\n", (void *) *timer, (void *) timed_call);
+#endif
         delete *timer;
         break;
     }
