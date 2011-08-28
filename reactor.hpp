@@ -3,7 +3,8 @@
 #define NULL 0
 
 #include "log.hpp"
-#include <boost/ptr_container/ptr_list.hpp>
+#include <list>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +17,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#ifndef FD_COPY
 #define FD_COPY(f, t) memcpy(t, f, sizeof(*(f))) 
+#endif
 
 
 class DelayedCall{
@@ -50,7 +53,7 @@ private :
     fd_set read_filedescriptors;
     fd_set write_filedescriptors;
     fd_set error_filedescriptors;
-    boost::ptr_list<DelayedCall> timer_list;
+    std::list<DelayedCall*> timer_list;
     Reactor();
 
 public :

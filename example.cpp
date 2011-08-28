@@ -10,7 +10,7 @@ void print_hello_world(){
 int main(int argc, char** argv)
 {
   Reactor *reactor = Reactor::getInstance();
-  reactor->callLater(5, &print_hello_world);
+  reactor->callLater(0, &print_hello_world);
   reactor->run();
   return 0;
 }
