@@ -17,7 +17,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#ifndef FD_COPY
 #define FD_COPY(f, t) memcpy(t, f, sizeof(*(f))) 
+#endif
 
 
 class DelayedCall{
