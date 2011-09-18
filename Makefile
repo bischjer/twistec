@@ -66,12 +66,13 @@ distclean: clean
 	rm -f $(APP)
 
 test: $(TESTS)
+	./bin/testrunner
 
 reactor_unittest.o: reactor.so
-	$(CXX) -I. $(TEST_CXX_FLAGS) -c tests/reactor_unittest.cpp -o bin/test/reactor_unittest.o
+	$(CXX) -I. $(TEST_CXX_FLAGS) -c tests/reactor_unittest.cpp -o bin/reactor_unittest.o
 
 reactor_unittest: reactor_unittest.o
-	$(CXX) $(TEST_CXX_FLAGS) $(TEST_LD_FLAGS) -Lbin -lreactor bin/test/reactor_unittest.o bin/gtest_main.a -o bin/test/reactor_unittest
+	$(CXX) $(TEST_CXX_FLAGS) $(TEST_LD_FLAGS) -Lbin -lreactor bin/reactor_unittest.o bin/gtest_main.a -o bin/test/reactor_unittest
 
-example: reactor.so
+bin/example: reactor.so
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) example.cpp -Lbin -lreactor -o bin/example
