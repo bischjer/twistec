@@ -12,7 +12,8 @@ void is_running(void)
 	reactor->stop();
 }
 
-TEST(ReactorTest, run_and_stop) {
+TEST(ReactorTest, run_and_stop)
+{
 	Reactor* reactor = Reactor::getInstance();
 	EXPECT_FALSE(reactor->is_running());
 	reactor->callLater(0, &is_running);
