@@ -2,14 +2,12 @@
 #define REACTOR_H
 #define NULL 0
 
-#include "log.hpp"
+//#include "twistec_log.hpp"
 #include <list>
-#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <stdio.h>
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/time.h>
@@ -59,6 +57,7 @@ private :
 public :
     void run();
     void stop();
+	bool is_running();
 
     static Reactor* getInstance();
     void cancelTimedCall(DelayedCall* timedcall);

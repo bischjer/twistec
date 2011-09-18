@@ -26,38 +26,35 @@ APP         := bin/example
 CXX 		:= g++
 LD 			:= g++
 BUILDDIR    := _build
-DIRS        := $(BUILDDIR) bin static
+DIRS        := $(BUILDDIR) bin lib
 SOURCES 	:= $(wildcard *.cpp)
 OBJECTS 	:= $(patsubst %.cpp, %.o, $(SOURCES))
-CXXFLAGS 	:= $(CXXFLAGS) -pedantic
+CXXFLAGS 	:= $(CXXFLAGS) -pedantic -I .
+GTEST_DIR   := lib/googletest
+TEST_CXX_FLAGS := -g -Wall -Wextra -I"$(GTEST_DIR)/include"
+TEST_LD_FLAGS := -lpthread
+
 LDFLAGS     := $(LDFLAGS)
 PWD 		:= $(shell pwd)
 
-.PHONY: all clean depend
+TESTS       := reactor_unittest
 
-all: depend $(APP)
+.PHONY: all clean depend $(TESTS)
 
-$(APP): $(OBJECTS)
-	$(LD) -o $(APP) $(LDFLAGS) $(OBJECTS)
+all: depend reactor.so $(APP)
+
+reactor.o:
+	$(CXX) -o bin/reactor.o $(LDFLAGS) $(CXXFLAGS) -c reactor.cpp
+
+reactor.so: reactor.o
+	$(CXX) -shared -o bin/libreactor.so $(LDFLAGS) $(CXXFLAGS) bin/reactor.o
 
 debug: depend $(APP) -g2 -DDEBUG -Wall
 
-depend: make.dep
+depend: gtest_main.a
 
-make.dep:
-	for dir in $(DIRS); do if [ ! -d $$dir ]; then mkdir $$dir; fi; done
-	for file in $(SOURCES); do $(CXX) $(CXXFLAGS) -M $$file >> $@; done
-	@echo '***'
-	@echo
-	@echo 'You might want to concider running make dev-install!'
-	@echo
-	@echo '***'
-
-include make.dep
-
-dev-install:
-	sudo apt-get install git-svn
-	git svn clone -r588:HEAD http://googletest.googlecode.com/svn/trunk/ $(PWD)/static/googletest-ro
+gtest_main.a:
+	cd lib/googletest/make && make && cp gtest_main.a ../../../bin/; cd -;
 
 clean:
 	rm -f *.o
@@ -67,3 +64,14 @@ distclean: clean
 	rm -rf $(PWD)/bin/ $(PWD)/static/ $(PWD)/$(BUILDDIR)
 	rm make.dep
 	rm -f $(APP)
+
+test: $(TESTS)
+
+reactor_unittest.o: reactor.so
+	$(CXX) -I. $(TEST_CXX_FLAGS) -c tests/reactor_unittest.cpp -o bin/test/reactor_unittest.o
+
+reactor_unittest: reactor_unittest.o
+	$(CXX) $(TEST_CXX_FLAGS) $(TEST_LD_FLAGS) -Lbin -lreactor bin/test/reactor_unittest.o bin/gtest_main.a -o bin/test/reactor_unittest
+
+example: reactor.so
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) example.cpp -Lbin -lreactor -o bin/example

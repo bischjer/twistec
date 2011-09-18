@@ -23,7 +23,7 @@ Reactor* Reactor::getInstance()
 
 void Reactor::handle_signal(int signal)
 {
-    log("Signal %d caught. Terminating mainloop", signal);
+    //log("Signal %d caught. Terminating mainloop", signal);
     Reactor* reactor = Reactor::getInstance();
     reactor->stop();
 }
@@ -68,6 +68,11 @@ void Reactor::check_selects()
                &timeout) > 0)
     {
     }
+}
+
+bool Reactor::is_running()
+{
+	return !should_stop;
 }
 
 void Reactor::run_timers()
@@ -118,9 +123,6 @@ void Reactor::removeTimedCall(DelayedCall* timed_call)
     {
         if(*timer == timed_call)
         {
-#ifdef DEBUG
-            log("%p %p\n", (void *) *timer, (void *) timed_call);
-#endif
             delete *timer;
             break;
         }
@@ -146,13 +148,6 @@ bool DelayedCall::timedOut()
 {
     timeval now;
     gettimeofday(&now, NULL);
-#ifdef DEBUG
-    log_debug("%d.%d %d.%d\n",
-              (int)this->time.tv_sec,
-              (int)this->time.tv_usec,
-              (int)now.tv_sec,
-              (int)now.tv_usec);
-#endif
     if (now.tv_sec > this->time.tv_sec ||
         (now.tv_sec == this->time.tv_sec &&
          now.tv_usec > this->time.tv_usec)
