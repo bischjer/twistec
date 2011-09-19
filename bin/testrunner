@@ -1,0 +1,7 @@
+#! /bin/bash
+# set +x
+
+for f in `ls bin/test`
+do
+    ./bin/test/$f
+done
