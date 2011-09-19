@@ -11,10 +11,13 @@ extern "C" {
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/time.h>
-
+#ifndef FD_COPY
+#include <string.h>
+#endif
 #ifdef __cplusplus
 }
 #endif
+
 #ifndef FD_COPY
 #define FD_COPY(f, t) memcpy(t, f, sizeof(*(f))) 
 #endif

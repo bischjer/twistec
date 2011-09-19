@@ -29,19 +29,19 @@ BUILDDIR    := _build
 DIRS        := $(BUILDDIR) bin lib
 SOURCES 	:= $(wildcard *.cpp)
 OBJECTS 	:= $(patsubst %.cpp, %.o, $(SOURCES))
-CXXFLAGS 	:= $(CXXFLAGS) -pedantic -I .
+CXXFLAGS 	:= $(CXXFLAGS) -Wall -pedantic -I .
 GTEST_DIR   := lib/googletest
-TEST_CXX_FLAGS := -g -Wall -Wextra -I"$(GTEST_DIR)/include"
+TEST_CXX_FLAGS := -g -Wall -Wextra -I$(GTEST_DIR)/include
 TEST_LD_FLAGS := -lpthread
 
-LDFLAGS     := $(LDFLAGS)
+LDFLAGS     := $(LDFLAGS) -fPIC
 PWD 		:= $(shell pwd)
 
 TESTS       := reactor_unittest
 
 .PHONY: all clean depend $(TESTS)
 
-all: depend reactor.so $(APP)
+all: depend reactor.so
 
 reactor.o:
 	$(CXX) -o bin/reactor.o $(LDFLAGS) $(CXXFLAGS) -c reactor.cpp
@@ -72,7 +72,7 @@ reactor_unittest.o: reactor.so
 	$(CXX) -I. $(TEST_CXX_FLAGS) -c tests/reactor_unittest.cpp -o bin/reactor_unittest.o
 
 reactor_unittest: reactor_unittest.o
-	$(CXX) $(TEST_CXX_FLAGS) $(TEST_LD_FLAGS) -Lbin -lreactor bin/reactor_unittest.o bin/gtest_main.a -o bin/test/reactor_unittest
+	$(CXX) $(TEST_CXX_FLAGS) $(TEST_LD_FLAGS) bin/libreactor.so bin/reactor_unittest.o bin/gtest_main.a -o bin/test/reactor_unittest
 
-bin/example: reactor.so
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) example.cpp -Lbin -lreactor -o bin/example
+example: reactor.so
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fPIC bin/libreactor.so example.cpp -o bin/example
