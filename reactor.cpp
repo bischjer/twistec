@@ -77,15 +77,15 @@ bool Reactor::is_running()
 
 void Reactor::run_timers()
 {
-    std::list<DelayedCall*>::iterator timer;
+    std::list<DelayedCall>::iterator timer;
     for(timer = this->timer_list.begin();
         timer != this->timer_list.end();
         timer ++)
     {
-        if ((*timer)->timedOut())
+        if ((*timer).timedOut())
         {
-            (*timer)->func();
-            this->removeTimedCall(*timer);
+            (*timer).func();
+            this->removeTimedCall(&(*timer));
         }
     }
 }
@@ -99,7 +99,7 @@ DelayedCall* Reactor::newDelayedCall(int time, void (*func)())
 {
     DelayedCall* call_later = new DelayedCall(time,
                                               func);
-    this->timer_list.push_back(call_later);
+    this->timer_list.push_back(*call_later);
     return call_later;
 }
 
@@ -115,15 +115,15 @@ void Reactor::cancelTimedCall(DelayedCall* timed_call)
 
 void Reactor::removeTimedCall(DelayedCall* timed_call)
 {
-    //this->timer_list.erase(timed_call);
-    std::list<DelayedCall*>::iterator timer;
+    //this->timer_list.remove(*timed_call);
+    std::list<DelayedCall>::iterator timer;
     for (timer=this->timer_list.begin();
          timer!=this->timer_list.end();
          timer++)
     {
-        if(*timer == timed_call)
+        if(&(*timer) == timed_call)
         {
-            delete *timer;
+            this->timer_list.erase(timer);
             break;
         }
     }

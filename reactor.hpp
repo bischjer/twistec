@@ -46,7 +46,6 @@ private :
     static Reactor *instance;
     DelayedCall* newDelayedCall(int time, void (*func)());
     void check_selects();
-    void run_timers();
     void register_signal_handlers();
     static void handle_signal(int signal);
     bool should_stop;
@@ -54,11 +53,12 @@ private :
     fd_set read_filedescriptors;
     fd_set write_filedescriptors;
     fd_set error_filedescriptors;
-    std::list<DelayedCall*> timer_list;
+    std::list<DelayedCall> timer_list;
     Reactor();
 
 public :
     void run();
+    void run_timers();
     void stop();
 	bool is_running();
 

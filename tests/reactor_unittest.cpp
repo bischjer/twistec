@@ -22,3 +22,11 @@ TEST(ReactorTest, run_and_stop)
 	EXPECT_FALSE(reactor->is_running());
 	EXPECT_TRUE(ran_callback);
 }
+
+TEST(ReactorTest, remove_delayed_call)
+{
+	Reactor* reactor = Reactor::getInstance();
+	DelayedCall* delayed_call = reactor->callLater(0, &is_running);
+    reactor->removeTimedCall(delayed_call);
+    reactor->run();
+}
