@@ -115,7 +115,7 @@ void Reactor::cancelTimedCall(DelayedCall* timed_call)
 
 void Reactor::removeTimedCall(DelayedCall* timed_call)
 {
-    //this->timer_list.remove(*timed_call);
+	bool removed = false;
     std::list<DelayedCall>::iterator timer;
     for (timer=this->timer_list.begin();
          timer!=this->timer_list.end();
@@ -124,9 +124,11 @@ void Reactor::removeTimedCall(DelayedCall* timed_call)
         if(&(*timer) == timed_call)
         {
             this->timer_list.erase(timer);
+			removed = true;
             break;
         }
     }
+	assert(removed);
 }
 
 DelayedCall::DelayedCall(double time,

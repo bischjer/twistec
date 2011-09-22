@@ -8,6 +8,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <assert.h>
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/time.h>
