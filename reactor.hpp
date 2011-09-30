@@ -4,7 +4,6 @@
 
 //#include "twistec_log.hpp"
 #include <list>
-#include <iostream>
 #include <algorithm>
 
 #ifdef __cplusplus

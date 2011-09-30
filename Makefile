@@ -41,9 +41,9 @@ TESTS       := reactor_unittest
 
 .PHONY: all clean depend $(TESTS)
 
-all: depend reactor.so
+all: depend libreactor.so
 
-reactor.o:
+reactor.o: reactor.cpp reactor.hpp
 	$(CXX) -o reactor.o $(LDFLAGS) $(CXXFLAGS) -c reactor.cpp
 
 libreactor.so: reactor.o
