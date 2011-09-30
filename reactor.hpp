@@ -1,10 +1,11 @@
 #ifndef REACTOR_H
 #define REACTOR_H
-#define NULL 0
 
 //#include "twistec_log.hpp"
 #include <list>
 #include <algorithm>
+#include <iostream>
+#include <cstdlib>
 
 #ifdef __cplusplus
 extern "C" {

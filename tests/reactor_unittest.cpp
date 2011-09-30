@@ -15,8 +15,7 @@ void is_running(void)
 void is_running2(void)
 {
 	ran_callback = true;
-	Reactor* reactor = Reactor::getInstance();
-	EXPECT_FALSE(reactor->is_running());
+	EXPECT_FALSE(ran_callback);
 }
 
 TEST(ReactorTest, run_and_stop)

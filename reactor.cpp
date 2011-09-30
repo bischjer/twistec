@@ -23,7 +23,11 @@ Reactor* Reactor::getInstance()
 
 void Reactor::handle_signal(int signal)
 {
-    //log("Signal %d caught. Terminating mainloop", signal);
+	std::clog
+		<< "Signal "
+		<< signal
+		<< "caught. Terminating mainloop"
+		<< std::endl;
     Reactor* reactor = Reactor::getInstance();
     reactor->stop();
 }

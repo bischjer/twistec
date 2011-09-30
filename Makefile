@@ -1,4 +1,4 @@
-	# Makefile for twistec
+# Makefile for twistec
 #
 # Authors: bischjer
 #          wuurrd
@@ -29,9 +29,9 @@ BUILDDIR    := _build
 DIRS        := $(BUILDDIR) bin lib
 SOURCES 	:= $(wildcard *.cpp)
 OBJECTS 	:= $(patsubst %.cpp, %.o, $(SOURCES))
-CXXFLAGS 	:= $(CXXFLAGS) -Wall -pedantic -I .
+CXXFLAGS 	:= $(CXXFLAGS) -O3 -Wall -pedantic -I .
 GTEST_DIR   := lib/googletest
-TEST_CXX_FLAGS := -g -Wall -Wextra -I$(GTEST_DIR)/include
+TEST_CXX_FLAGS := -g -O3 -Wall -Wextra -I$(GTEST_DIR)/include
 TEST_LD_FLAGS := -lpthread
 
 LDFLAGS     := $(LDFLAGS) -fPIC
@@ -61,19 +61,14 @@ clean:
 	rm -f *.so
 	rm -f *~
 
-distclean: clean
-	rm -rf $(PWD)/bin/ $(PWD)/static/ $(PWD)/$(BUILDDIR)
-	rm make.dep
-	rm -f $(APP)
-
 test: $(TESTS)
 	./bin/testrunner
 
-reactor_unittest.o: libreactor.so
+reactor_unittest.o: libreactor.so tests/reactor_unittest.cpp
 	$(CXX) -I. $(TEST_CXX_FLAGS) -c tests/reactor_unittest.cpp -o reactor_unittest.o
 
 reactor_unittest: reactor_unittest.o
 	$(CXX) $(TEST_CXX_FLAGS) $(TEST_LD_FLAGS) libreactor.so reactor_unittest.o bin/gtest_main.a -o bin/test/reactor_unittest
 
-example: reactor.so
+example: libreactor.so
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fPIC libreactor.so example.cpp -o bin/example
