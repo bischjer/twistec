@@ -4,6 +4,8 @@
 
 //#include "twistec_log.hpp"
 #include <list>
+#include <iostream>
+#include <algorithm>
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +22,7 @@ extern "C" {
 #endif
 
 #ifndef FD_COPY
-#define FD_COPY(f, t) memcpy(t, f, sizeof(*(f))) 
+#define FD_COPY(f, t) memcpy(t, f, sizeof(*(f)))
 #endif
 
 
@@ -37,9 +39,19 @@ class DelayedCall{
   DelayedCall(double time,
               void (*func)());
   ~DelayedCall();
+  bool operator== (const DelayedCall&);
   bool timedOut();
   void cancel();
   void isActive();
+};
+
+class DelayedCallComparator
+{
+public:
+    DelayedCallComparator(DelayedCall*);
+	bool operator() (DelayedCall*);
+private:
+	DelayedCall* _item;
 };
 
 class Reactor {
@@ -54,7 +66,7 @@ private :
     fd_set read_filedescriptors;
     fd_set write_filedescriptors;
     fd_set error_filedescriptors;
-    std::list<DelayedCall> timer_list;
+    std::list<DelayedCall*> timer_list;
     Reactor();
 
 public :

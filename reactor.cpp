@@ -77,15 +77,15 @@ bool Reactor::is_running()
 
 void Reactor::run_timers()
 {
-    std::list<DelayedCall>::iterator timer;
+    std::list<DelayedCall*>::iterator timer;
     for(timer = this->timer_list.begin();
         timer != this->timer_list.end();
         timer ++)
     {
-        if ((*timer).timedOut())
+        if ((*timer)->timedOut())
         {
-            (*timer).func();
-            this->removeTimedCall(&(*timer));
+            (*timer)->func();
+            this->removeTimedCall(*timer);
         }
     }
 }
@@ -99,7 +99,7 @@ DelayedCall* Reactor::newDelayedCall(int time, void (*func)())
 {
     DelayedCall* call_later = new DelayedCall(time,
                                               func);
-    this->timer_list.push_back(*call_later);
+    this->timer_list.push_back(call_later);
     return call_later;
 }
 
@@ -113,22 +113,23 @@ void Reactor::cancelTimedCall(DelayedCall* timed_call)
     this->removeTimedCall(timed_call);
 }
 
+DelayedCallComparator::DelayedCallComparator(DelayedCall* item)
+ :_item(item)
+{
+}
+
+bool DelayedCallComparator::operator() (DelayedCall* other)
+{
+	return (_item == other);
+}
+
 void Reactor::removeTimedCall(DelayedCall* timed_call)
 {
-	bool removed = false;
-    std::list<DelayedCall>::iterator timer;
-    for (timer=this->timer_list.begin();
-         timer!=this->timer_list.end();
-         timer++)
-    {
-        if(&(*timer) == timed_call)
-        {
-            this->timer_list.erase(timer);
-			removed = true;
-            break;
-        }
-    }
-	assert(removed);
+	std::list<DelayedCall*>::iterator location;
+	location = std::find_if(timer_list.begin(),
+							timer_list.end(),
+							DelayedCallComparator(timed_call));
+	timer_list.erase(location);
 }
 
 DelayedCall::DelayedCall(double time,
@@ -144,6 +145,11 @@ DelayedCall::DelayedCall(double time,
 
 DelayedCall::~DelayedCall()
 {
+}
+
+bool DelayedCall::operator== (const DelayedCall& other)
+{
+	return this == &other;
 }
 
 bool DelayedCall::timedOut()
