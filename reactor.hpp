@@ -1,13 +1,16 @@
 #ifndef REACTOR_H
 #define REACTOR_H
-#define NULL 0
 
 //#include "twistec_log.hpp"
 #include <list>
+#include <algorithm>
+#include <iostream>
+#include <cstdlib>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <assert.h>
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/time.h>
@@ -19,7 +22,7 @@ extern "C" {
 #endif
 
 #ifndef FD_COPY
-#define FD_COPY(f, t) memcpy(t, f, sizeof(*(f))) 
+#define FD_COPY(f, t) memcpy(t, f, sizeof(*(f)))
 #endif
 
 
@@ -36,9 +39,19 @@ class DelayedCall{
   DelayedCall(double time,
               void (*func)());
   ~DelayedCall();
+  bool operator== (const DelayedCall&);
   bool timedOut();
   void cancel();
   void isActive();
+};
+
+class DelayedCallComparator
+{
+public:
+    DelayedCallComparator(DelayedCall*);
+	bool operator() (DelayedCall*);
+private:
+	DelayedCall* _item;
 };
 
 class Reactor {
@@ -46,7 +59,6 @@ private :
     static Reactor *instance;
     DelayedCall* newDelayedCall(int time, void (*func)());
     void check_selects();
-    void run_timers();
     void register_signal_handlers();
     static void handle_signal(int signal);
     bool should_stop;
@@ -59,6 +71,7 @@ private :
 
 public :
     void run();
+    void run_timers();
     void stop();
 	bool is_running();
 

@@ -23,7 +23,11 @@ Reactor* Reactor::getInstance()
 
 void Reactor::handle_signal(int signal)
 {
-    //log("Signal %d caught. Terminating mainloop", signal);
+	std::clog
+		<< "Signal "
+		<< signal
+		<< "caught. Terminating mainloop"
+		<< std::endl;
     Reactor* reactor = Reactor::getInstance();
     reactor->stop();
 }
@@ -113,20 +117,23 @@ void Reactor::cancelTimedCall(DelayedCall* timed_call)
     this->removeTimedCall(timed_call);
 }
 
+DelayedCallComparator::DelayedCallComparator(DelayedCall* item)
+ :_item(item)
+{
+}
+
+bool DelayedCallComparator::operator() (DelayedCall* other)
+{
+	return (_item == other);
+}
+
 void Reactor::removeTimedCall(DelayedCall* timed_call)
 {
-    //this->timer_list.erase(timed_call);
-    std::list<DelayedCall*>::iterator timer;
-    for (timer=this->timer_list.begin();
-         timer!=this->timer_list.end();
-         timer++)
-    {
-        if(*timer == timed_call)
-        {
-            delete *timer;
-            break;
-        }
-    }
+	std::list<DelayedCall*>::iterator location;
+	location = std::find_if(timer_list.begin(),
+							timer_list.end(),
+							DelayedCallComparator(timed_call));
+	timer_list.erase(location);
 }
 
 DelayedCall::DelayedCall(double time,
@@ -142,6 +149,11 @@ DelayedCall::DelayedCall(double time,
 
 DelayedCall::~DelayedCall()
 {
+}
+
+bool DelayedCall::operator== (const DelayedCall& other)
+{
+	return this == &other;
 }
 
 bool DelayedCall::timedOut()
